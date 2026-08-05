@@ -1,0 +1,130 @@
+:root {
+  --ink: #1b2430;
+  --paper: #eee7d6;
+  --stamp: #b33a3a;
+  --gold: #c9a227;
+  --green: #08744a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: "Georgia", "Iowan Old Style", serif;
+}
+
+.fraunces {
+  font-family: "Fraunces", serif;
+}
+
+.inter {
+  font-family: "Inter", sans-serif;
+}
+
+.mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.field-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(27, 36, 48, 0.2);
+  padding: 10px 2px;
+  font-size: 16px;
+  font-family: "Inter", sans-serif;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.field-input:focus {
+  border-bottom-color: var(--green);
+}
+
+.field-input::placeholder {
+  color: rgba(27, 36, 48, 0.4);
+}
+
+.submit-btn {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 14px 28px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--green);
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ghost-btn {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.tab-btn {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  padding: 10px 4px;
+  cursor: pointer;
+  color: rgba(27, 36, 48, 0.55);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--stamp);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid rgba(27, 36, 48, 0.15);
+  padding: 20px 22px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1.4s linear infinite;
+}
+
+@media (max-width: 640px) {
+  .dossier-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
