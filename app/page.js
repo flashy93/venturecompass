@@ -1,8 +1,8 @@
 "use client";
-
-import React, { useState } from "react";
+ 
+import React, { useState, useEffect } from "react";
 import { Briefcase, DollarSign, Globe2, Mail, Loader2, Stamp, ChevronRight, RotateCcw, Lock } from "lucide-react";
-
+ 
 export default function Page() {
   const [stage, setStage] = useState("form"); // form | loading | result | error | paywall | limited
   const [email, setEmail] = useState("");
@@ -13,9 +13,19 @@ export default function Page() {
   const [errMsg, setErrMsg] = useState("");
   const [checkoutUrl, setCheckoutUrl] = useState("");
   const [activeTab, setActiveTab] = useState("ideas");
-
+  const [ref, setRef] = useState(null);
+ 
+  // Capture ?ref=CODE from the URL (e.g. a creator's tracked link) once on
+  // load, so it can be forwarded to checkout without needing any browser
+  // storage — it just lives in this page's state for the session.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const r = params.get("ref");
+    if (r) setRef(r);
+  }, []);
+ 
   const canSubmit = email.trim() && skills.trim() && budget.trim() && country.trim();
-
+ 
   async function generate() {
     setStage("loading");
     setErrMsg("");
@@ -26,9 +36,10 @@ export default function Page() {
         body: JSON.stringify({ email, skills, budget, country }),
       });
       const json = await res.json();
-
+ 
       if (res.status === 402) {
-        setCheckoutUrl(json.checkoutUrl);
+        const url = ref ? `${json.checkoutUrl}&ref=${encodeURIComponent(ref)}` : json.checkoutUrl;
+        setCheckoutUrl(url);
         setStage("paywall");
         return;
       }
@@ -42,7 +53,7 @@ export default function Page() {
         setStage("error");
         return;
       }
-
+ 
       setData(json.data);
       setActiveTab("ideas");
       setStage("result");
@@ -51,7 +62,7 @@ export default function Page() {
       setStage("error");
     }
   }
-
+ 
   function reset() {
     setStage("form");
     setData(null);
@@ -59,7 +70,7 @@ export default function Page() {
     setBudget("");
     setCountry("");
   }
-
+ 
   return (
     <div style={{ minHeight: "100vh", padding: 0 }}>
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
@@ -89,14 +100,14 @@ export default function Page() {
           </div>
         </div>
         <div style={{ height: 1, background: "rgba(27,36,48,0.13)", margin: "24px 0 40px" }} />
-
+ 
         {stage === "form" && (
           <div>
             <p className="inter" style={{ fontSize: 15, lineHeight: 1.7, color: "rgba(27,36,48,0.8)", marginBottom: 36 }}>
               Tell us your skills, your budget, and your country. We'll compile a personalized dossier: three
               tailored business ideas, an itemized cost sheet, a marketing plan, and a profit estimate.
             </p>
-
+ 
             <div style={{ display: "flex", flexDirection: "column", gap: 28, marginBottom: 40 }}>
               <Field
                 icon={<Mail size={16} color="#08744a" />}
@@ -128,20 +139,20 @@ export default function Page() {
                 onChange={setCountry}
               />
             </div>
-
+ 
             <button className="submit-btn" disabled={!canSubmit} onClick={generate}>
               Compile My Plan <ChevronRight size={16} />
             </button>
           </div>
         )}
-
+ 
         {stage === "loading" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 0", gap: 16 }}>
             <Loader2 className="spin" size={28} color="#1b2430" />
             <div className="inter" style={{ fontSize: 14, color: "rgba(27,36,48,0.6)" }}>Compiling your plan...</div>
           </div>
         )}
-
+ 
         {stage === "paywall" && (
           <div style={{ padding: "40px 0" }}>
             <div className="card" style={{ borderLeft: "4px solid #c9a227", marginBottom: 24 }}>
@@ -159,21 +170,21 @@ export default function Page() {
             </a>
           </div>
         )}
-
+ 
         {stage === "limited" && (
           <div style={{ padding: "40px 0" }}>
             <p className="inter" style={{ color: "#b33a3a", marginBottom: 20 }}>{errMsg}</p>
             <button className="submit-btn ghost-btn" onClick={reset}>Back</button>
           </div>
         )}
-
+ 
         {stage === "error" && (
           <div style={{ padding: "40px 0" }}>
             <p className="inter" style={{ color: "#b33a3a", marginBottom: 20 }}>{errMsg}</p>
             <button className="submit-btn" onClick={generate}>Try Again</button>
           </div>
         )}
-
+ 
         {stage === "result" && data && (
           <div>
             <div style={{ display: "flex", gap: 24, marginBottom: 28, flexWrap: "wrap" }}>
@@ -183,7 +194,7 @@ export default function Page() {
                 </button>
               ))}
             </div>
-
+ 
             {activeTab === "ideas" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {data.ideas.map((idea, i) => (
@@ -206,7 +217,7 @@ export default function Page() {
                 ))}
               </div>
             )}
-
+ 
             {activeTab === "costs" && (
               <div>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -225,7 +236,7 @@ export default function Page() {
                 </div>
               </div>
             )}
-
+ 
             {activeTab === "marketing" && (
               <div>
                 <p className="inter" style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>{data.marketingPlan.positioning}</p>
@@ -253,7 +264,7 @@ export default function Page() {
                 </div>
               </div>
             )}
-
+ 
             {activeTab === "profit" && (
               <div>
                 <div className="dossier-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
@@ -267,7 +278,7 @@ export default function Page() {
                 </p>
               </div>
             )}
-
+ 
             <div style={{ marginTop: 40 }}>
               <button className="submit-btn ghost-btn" onClick={reset}>
                 <RotateCcw size={14} /> New Dossier
@@ -279,7 +290,7 @@ export default function Page() {
     </div>
   );
 }
-
+ 
 function Field({ icon, label, placeholder, value, onChange, type = "text" }) {
   return (
     <div>
@@ -293,7 +304,7 @@ function Field({ icon, label, placeholder, value, onChange, type = "text" }) {
     </div>
   );
 }
-
+ 
 function Stat({ label, value }) {
   return (
     <div className="card" style={{ padding: "16px 18px" }}>
